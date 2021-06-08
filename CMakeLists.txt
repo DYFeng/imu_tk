@@ -22,10 +22,11 @@ include_directories(./include
                     ${CERES_INCLUDE_DIRS})
 
 #Vis3D
-find_package(Qt4 COMPONENTS QtCore QtGui QtOpenGL REQUIRED )
+find_package(Qt5OpenGL)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 
+include_directories(${Qt5OpenGL_INCLUDE_DIRS})
 include_directories( ${OPENGL_INCLUDE_DIRS}  
                      ${GLUT_INCLUDE_DIRS}
                      ${CMAKE_CURRENT_BINARY_DIR} )
@@ -35,16 +36,17 @@ set(IMU_TK_VIS_EXTRA_SOURCES
     ./src/vis_extra/opengl_3d_scene.cpp )
 set(IMU_TK_VIS_EXTRA_HEADERS
     ./include/imu_tk/vis_extra/opengl_3d_scene.h )
-    
-qt4_wrap_cpp(IMU_TK_VIS_EXTRA_HEADERS_MOC ${IMU_TK_VIS_EXTRA_HEADERS})
 
-include(${QT_USE_FILE})
-add_definitions(${QT_DEFINITIONS})
+qt5_wrap_cpp(IMU_TK_VIS_EXTRA_HEADERS_MOC ${IMU_TK_VIS_EXTRA_HEADERS})
+
+add_definitions(${Qt5OpenGL_DEFINITIONS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5OpenGL_EXECUTABLE_COMPILE_FLAGS}")
 
 aux_source_directory( ./src IMU_TK_CORE_SRC )
 set( IMU_TK_SRC ${IMU_TK_CORE_SRC} ${IMU_TK_VIS_EXTRA_HEADERS_MOC} ${IMU_TK_VIS_EXTRA_SOURCES} )
 
 add_library(imu_tk ${IMU_TK_SRC})
+target_link_libraries(imu_tk Qt5::OpenGL)
 set_target_properties(imu_tk PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 set (IMU_TK_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include CACHE STRING "imu_tk include directories")
